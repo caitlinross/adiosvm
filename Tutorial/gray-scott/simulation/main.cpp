@@ -6,6 +6,10 @@
 #include <adios2.h>
 #include <mpi.h>
 
+#ifdef ENABLE_ADIS
+#include <adis/DataSetReader.h>
+#endif
+
 #include "../common/timer.hpp"
 #include "gray-scott.h"
 #include "writer.h"
@@ -40,6 +44,28 @@ void print_simulator_settings(const GrayScott &s)
               << s.size_z << std::endl;
 }
 
+#ifdef ENABLE_ADIS
+void analysis(adis::io::DataSetReader& reader, int rank)
+{
+    adis::metadata::MetaData selections;
+    adis::metadata::Vector<size_t> blockSelection;
+    blockSelection.Data.push_back(rank);
+    selections.Set(adis::keys::BLOCK_SELECTION(), blockSelection);
+    std::cout << "set the block selection with rank: "<< rank << std::endl;
+
+    //this name should be different with the name in setting for inline engine
+    std::string fname = "SimulationReader";
+    std::unordered_map<std::string, std::string> paths;
+    paths["the-source"] = fname;
+
+    std::cout << "[" << rank << "]: reading next step" << std::endl;
+    vtkm::cont::PartitionedDataSet outputds =
+        reader.ReadDataSetNextStep(paths, selections);
+
+    outputds.GetPartition(0).PrintSummary(std::cout);
+}
+#endif
+
 int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
@@ -54,6 +80,15 @@ int main(int argc, char **argv)
     MPI_Comm_rank(comm, &rank);
     MPI_Comm_size(comm, &procs);
 
+#ifdef ENABLE_ADIS
+    if (argc < 3) {
+        if (rank == 0) {
+            std::cerr << "Too few arguments" << std::endl;
+            std::cerr << "Usage: gray-scott settings.json adis.json" << std::endl;
+        }
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
+#else
     if (argc < 2) {
         if (rank == 0) {
             std::cerr << "Too few arguments" << std::endl;
@@ -61,6 +96,7 @@ int main(int argc, char **argv)
         }
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
+#endif
 
     Settings settings = Settings::from_json(argv[1]);
 
@@ -70,6 +106,17 @@ int main(int argc, char **argv)
     adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
     adios2::IO io_ckpt = adios.DeclareIO("SimulationCheckpoint");
+
+#ifdef ENABLE_ADIS
+    // setup ADIS if using
+    std::string adisJsonConfig = std::string(argv[2]);
+    adis::io::DataSetReader reader(adisJsonConfig);
+    adis::DataSourceParams params;
+    params["engine_type"] = "Inline";
+    params["writer_id"] = settings.output;
+    reader.SetDataSourceParameters("the-source", std::move(params));
+    reader.SetDataSourceIO("the-source", &io_main);
+#endif
 
     Writer writer_main(settings, sim, io_main);
     Writer writer_ckpt(settings, sim, io_ckpt);
@@ -129,6 +176,8 @@ int main(int argc, char **argv)
             writer_ckpt.close();
         }
 
+        analysis(reader, rank);
+
 #ifdef ENABLE_TIMERS
         double time_write = timer_write.stop();
         double time_step = timer_total.stop();
@@ -147,6 +196,7 @@ int main(int argc, char **argv)
 
     log.close();
 #endif
+
 
     MPI_Finalize();
 }

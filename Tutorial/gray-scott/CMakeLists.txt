@@ -17,6 +17,12 @@ if(USE_TIMERS)
   add_definitions(-DENABLE_TIMERS)
 endif()
 
+option(USE_ADIS "Use ADIS library")
+if (USE_ADIS)
+  find_package(ADIS REQUIRED)
+  add_definitions(-DENABLE_ADIS)
+endif()
+
 # We are not using the C++ API of MPI, this will stop the compiler look for it
 add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
 
@@ -27,6 +33,10 @@ add_executable(gray-scott
   simulation/writer.cpp
 )
 target_link_libraries(gray-scott adios2::adios2 MPI::MPI_C)
+
+if (USE_ADIS)
+  target_link_libraries(gray-scott adis)
+endif()
 
 add_executable(pdf_calc analysis/pdf_calc.cpp)
 target_link_libraries(pdf_calc adios2::adios2 MPI::MPI_C)
