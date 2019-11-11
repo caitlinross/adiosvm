@@ -49,7 +49,7 @@ void analysis(adis::io::DataSetReader& reader, int rank)
 {
     adis::metadata::MetaData selections;
     adis::metadata::Vector<size_t> blockSelection;
-    blockSelection.Data.push_back(rank);
+    blockSelection.Data.push_back(0);
     selections.Set(adis::keys::BLOCK_SELECTION(), blockSelection);
     std::cout << "set the block selection with rank: "<< rank << std::endl;
 
