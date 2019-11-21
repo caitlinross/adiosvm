@@ -175,9 +175,9 @@ int main(int argc, char **argv)
             writer_ckpt.write(i, sim);
             writer_ckpt.close();
         }
-
+#ifdef ENABLE_ADIS
         analysis(reader, rank);
-
+#endif
 #ifdef ENABLE_TIMERS
         double time_write = timer_write.stop();
         double time_step = timer_total.stop();
