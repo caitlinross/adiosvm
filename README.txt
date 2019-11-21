@@ -849,3 +849,11 @@ GLOBAL/GTAGS
 
 
 
+## ADIS
+
+If you wish to run this using ADIS, build with
+
+```
+Tutorial/gray-scott/build$ cmake -DUSE_ADIS=ON .. && make
+Tutorial/gray-scott$ mpirun -n 4 build/gray-scott simulation/settings-files.json adis/adis-gray-scott.json
+```
