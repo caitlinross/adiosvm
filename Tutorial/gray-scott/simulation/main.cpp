@@ -62,7 +62,8 @@ void analysis(adis::io::DataSetReader& reader, int rank)
     vtkm::cont::PartitionedDataSet outputds =
         reader.ReadDataSetNextStep(paths, selections);
 
-    outputds.GetPartition(0).PrintSummary(std::cout);
+    // This call gives us a use-after-free bug.
+    //outputds.GetPartition(0).PrintSummary(std::cout);
 }
 #endif
 
@@ -175,9 +176,9 @@ int main(int argc, char **argv)
             writer_ckpt.write(i, sim);
             writer_ckpt.close();
         }
-
+#ifdef ENABLE_ADIS
         analysis(reader, rank);
-
+#endif
 #ifdef ENABLE_TIMERS
         double time_write = timer_write.stop();
         double time_step = timer_total.stop();

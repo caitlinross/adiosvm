@@ -23,23 +23,20 @@ if (USE_ADIS)
   add_definitions(-DENABLE_ADIS)
 endif()
 
-# We are not using the C++ API of MPI, this will stop the compiler look for it
-add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
-
 add_executable(gray-scott
   simulation/main.cpp
   simulation/gray-scott.cpp
   simulation/settings.cpp
   simulation/writer.cpp
 )
-target_link_libraries(gray-scott adios2::adios2 MPI::MPI_C)
+target_link_libraries(gray-scott adios2::adios2 MPI::MPI_C MPI::MPI_CXX)
 
 if (USE_ADIS)
   target_link_libraries(gray-scott adis)
 endif()
 
 add_executable(pdf_calc analysis/pdf_calc.cpp)
-target_link_libraries(pdf_calc adios2::adios2 MPI::MPI_C)
+target_link_libraries(pdf_calc adios2::adios2 MPI::MPI_C MPI::MPI_CXX)
 
 option(VTK "Build VTK apps")
 if (VTK_ROOT)
