@@ -62,7 +62,8 @@ void analysis(adis::io::DataSetReader& reader, int rank)
     vtkm::cont::PartitionedDataSet outputds =
         reader.ReadDataSetNextStep(paths, selections);
 
-    outputds.GetPartition(0).PrintSummary(std::cout);
+    // This call gives us a use-after-free bug.
+    //outputds.GetPartition(0).PrintSummary(std::cout);
 }
 #endif
 
