@@ -18,6 +18,7 @@ add_executable(gray-scott
   simulation/gray-scott.cpp
   simulation/settings.cpp
   simulation/writer.cpp
+  simulation/reader.cpp
 )
 target_link_libraries(gray-scott 
   PRIVATE

@@ -8,6 +8,7 @@
 
 #include "gray-scott.h"
 #include "writer.h"
+#include "reader.h"
 
 void print_settings(const Settings &s)
 {
@@ -66,12 +67,15 @@ int main(int argc, char **argv)
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
 
     Writer writer(settings, sim, io_main);
+    Reader reader(io_main);
 
     writer.open(settings.output);
+    reader.open(settings.output);
 
     if (rank == 0)
     {
         writer.print_settings();
+        reader.print_settings();
         std::cout << "========================================" << std::endl;
         print_settings(settings);
         print_simulator_settings(sim);
@@ -93,8 +97,10 @@ int main(int argc, char **argv)
                       << std::endl;
         }
         writer.write(i, sim);
+        reader.read();
     }
 
     writer.close();
+    reader.close();
     MPI_Finalize();
 }
