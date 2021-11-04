@@ -5,11 +5,12 @@
 #include <mpi.h>
 
 #include "gray-scott.h"
+#include "settings.h"
 
 class Reader
 {
 public:
-    Reader(adios2::IO io);
+    Reader(const Settings &settings, adios2::IO io, int argc, char* argv[]);
     void open(const std::string &fname);
     void read();
     void close();
@@ -17,6 +18,8 @@ public:
     void print_settings();
 
 protected:
+    const Settings &settings;
+
     adios2::IO io;
     adios2::Engine reader;
     adios2::Variable<double> var_u;

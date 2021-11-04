@@ -1,9 +1,13 @@
 #include "reader.h"
 
+#ifdef USE_CATALYST
+#include "CatalystAdaptor.h"
+#endif
+
 #include <iostream>
 
-Reader::Reader(adios2::IO io)
-: io(io)
+Reader::Reader(const Settings &settings, adios2::IO io, int argc, char* argv[])
+: settings(settings), io(io)
 {
     var_u = io.InquireVariable<double>("U");
 
@@ -11,7 +15,9 @@ Reader::Reader(adios2::IO io)
 
     var_step = io.InquireVariable<int>("step");
 
-    // TODO catalyst init
+#ifdef USE_CATALYST
+    CatalystAdaptor::Initialize(argc, argv);
+#endif
 }
 
 void Reader::open(const std::string &fname)
@@ -27,14 +33,20 @@ void Reader::read()
     reader.Get(var_u, &u_out);
     reader.Get(var_v, &v_out);
 
-    // TODO catalyst execute call
+#ifdef USE_CATALYST
+    CatalystAdaptor::Execute(reader.CurrentStep(), reader.CurrentStep(), settings,
+        u_out, var_u.SelectionSize(), v_out, var_v.SelectionSize());
+#endif
+
     reader.EndStep();
 }
 
 void Reader::close()
 {
   reader.Close();
-  // TODO catalyst finalize
+#ifdef USE_CATALYST
+    CatalystAdaptor::Finalize();
+#endif
 }
 
 void Reader::print_settings()

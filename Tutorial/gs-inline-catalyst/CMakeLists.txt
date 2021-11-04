@@ -23,6 +23,9 @@ add_executable(gray-scott
 target_link_libraries(gray-scott 
   PRIVATE
     adios2::cxx11_mpi MPI::MPI_C)
+target_include_directories(gray-scott
+  PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/simulation)
 
 add_executable(pdf-calc analysis/pdf-calc.cpp)
 target_link_libraries(pdf-calc adios2::cxx11_mpi MPI::MPI_C)
@@ -38,4 +41,7 @@ if (USE_CATALYST)
   target_link_libraries(gray-scott
     PRIVATE
       catalyst::catalyst)
+  target_include_directories(gray-scott
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}/catalyst)
 endif()

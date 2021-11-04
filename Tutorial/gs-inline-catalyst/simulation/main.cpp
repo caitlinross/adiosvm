@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
 
     Writer writer(settings, sim, io_main);
-    Reader reader(io_main);
+    Reader reader(settings, io_main, argc, argv);
 
     writer.open(settings.output);
     reader.open(settings.output);
