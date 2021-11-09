@@ -97,7 +97,7 @@ int main(int argc, char **argv)
                       << std::endl;
         }
         writer.write(i, sim);
-        reader.read();
+        reader.read(i);
     }
 
     writer.close();

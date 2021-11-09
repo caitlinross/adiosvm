@@ -25,7 +25,7 @@ void Reader::open(const std::string &fname)
     reader = io.Open(fname + "-read", adios2::Mode::Read);
 }
 
-void Reader::read()
+void Reader::read(int step)
 {
     reader.BeginStep();
     // Get calls to data
@@ -34,8 +34,10 @@ void Reader::read()
     reader.Get(var_v, &v_out);
 
 #ifdef USE_CATALYST
-    CatalystAdaptor::Execute(reader.CurrentStep(), reader.CurrentStep(), settings,
-        u_out, var_u.SelectionSize(), v_out, var_v.SelectionSize());
+    CatalystAdaptor::Execute(reader.CurrentStep(),
+        step, settings,
+        u_out, var_u.SelectionSize(),
+        v_out, var_v.SelectionSize());
 #endif
 
     reader.EndStep();

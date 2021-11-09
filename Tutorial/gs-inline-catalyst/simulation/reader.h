@@ -12,7 +12,7 @@ class Reader
 public:
     Reader(const Settings &settings, adios2::IO io, int argc, char* argv[]);
     void open(const std::string &fname);
-    void read();
+    void read(int step);
     void close();
 
     void print_settings();

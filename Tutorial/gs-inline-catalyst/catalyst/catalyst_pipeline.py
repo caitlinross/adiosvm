@@ -50,8 +50,3 @@ def catalyst_execute(info):
     print("bounds:", producer.GetDataInformation().GetBounds())
     print("u-range:", producer.PointData["u"].GetRange(0))
     print("v-range:", producer.PointData["v"].GetRange(0))
-
-    print("bounds:", clip.GetDataInformation().GetBounds())
-    print("u-range:", clip.PointData["u"].GetRange(0))
-    print("v-range:", clip.PointData["v"].GetRange(0))
-
