@@ -8,7 +8,11 @@
 
 #include "gray-scott.h"
 #include "writer.h"
+#ifdef USE_FIDES
+#include "fides_reader.h"
+#else
 #include "reader.h"
+#endif
 
 void print_settings(const Settings &s)
 {
@@ -67,7 +71,11 @@ int main(int argc, char **argv)
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
 
     Writer writer(settings, sim, io_main);
+#ifdef USE_FIDES
+    FidesReader reader(settings, io_main, argc, argv);
+#else
     Reader reader(settings, io_main, argc, argv);
+#endif
 
     writer.open(settings.output);
     reader.open(settings.output);

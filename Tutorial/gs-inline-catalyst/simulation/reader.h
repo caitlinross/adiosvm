@@ -7,11 +7,6 @@
 #include "gray-scott.h"
 #include "settings.h"
 
-#ifdef USE_FIDES
-#include <fides/DataSetReader.h>
-#endif
-
-#include <memory>
 
 class Reader
 {
@@ -27,15 +22,10 @@ protected:
     const Settings &settings;
 
     adios2::IO io;
-#if USE_FIDES
-    std::unique_ptr<fides::io::DataSetReader> FidesReader;
-    std::unordered_map<std::string, std::string> FidesPaths;
-#else
     adios2::Engine reader;
     adios2::Variable<double> var_u;
     adios2::Variable<double> var_v;
     adios2::Variable<int> var_step;
-#endif
 };
 
 #endif
