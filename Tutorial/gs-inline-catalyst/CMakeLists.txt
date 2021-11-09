@@ -45,3 +45,14 @@ if (USE_CATALYST)
     PRIVATE
       ${CMAKE_CURRENT_LIST_DIR}/catalyst)
 endif()
+
+option(USE_FIDES "Build with Fides enabled" ON)
+if (USE_FIDES)
+  find_package(Fides REQUIRED)
+  target_compile_definitions(gray-scott
+    PRIVATE
+        USE_FIDES=1)
+  target_link_libraries(gray-scott
+    PRIVATE
+      fides vtkm_filter vtkm_rendering)
+endif()
